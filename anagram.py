@@ -1,4 +1,4 @@
-import argparse, fileinput, itertools, string, time
+import argparse, fileinput, itertools, time
 # import ipdb; ipdb.set_trace()
 
 
@@ -40,12 +40,6 @@ def stripper(args):
     return new_dict
 
 
-def wordchecker(new_dict, anagram):
-    if anagram in new_dict:
-        return True
-    return False
-
-
 def word_list(new_dict, anagram):
     word = anagram.word
     wordlist = list(word)
@@ -55,11 +49,12 @@ def word_list(new_dict, anagram):
     tries = 0
     match = 0
 
-    for combo in combos:
-        if wordchecker(new_dict, ''.join(combo)):
+    for d in new_dict:
+        if any(d in combo for combo in combos):
             match += 1
-            print 'Match found: ' + ''.join(combo)
+            print 'Match found: ' + d
         tries += 1
+
     checks_per_second = (tries * len(new_dict)) / time.clock()
     print '{} matches found out of {} combinations in {} seconds\n{} checks per second'.format(
         match,
