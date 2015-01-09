@@ -1,4 +1,5 @@
-import argparse, fileinput, itertools
+import argparse, fileinput, itertools, string, time
+# import ipdb; ipdb.set_trace()
 
 
 def parser():
@@ -6,50 +7,73 @@ def parser():
     parser.add_argument('-w',
                         "--word",
                         help='Input a word',
-                        required=True)
+                        required=True
+                        )
+    parser.add_argument('-e',
+                        "--exact",
+                        help='Word matches have to be exact length',
+                        required=False,
+                        action='store_true'
+                        )
     args = parser.parse_args()
     return args
 
 
-def stripper(string):
-    string = string.word
+def stripper(args):
+    anagram = args.word
+    print '{} letter anagram'.format(len(anagram))
     filein = fileinput.input(['words'])
+    word_list = list(anagram)
     new_dict = []
-    for line in filein:
-        clean_word = line.rstrip()
-        if len(clean_word) <= len(string):
-            new_dict.append(clean_word)
 
-    # wordlist = list(string)
-    # alpha = string.lowercase
-    # for l in wordlist:
-    #     alpha = alpha.replace(l, '')
+    for letter in word_list:
+        for line in filein:
+            clean_word = line.rstrip().lower()
+            if args.exact:
+                if len(clean_word) == len(anagram) and letter in clean_word:
+                    new_dict.append(clean_word)
+            else:
+                if len(clean_word) <= len(anagram) and letter in clean_word:
+                    new_dict.append(clean_word)
+
+    print 'Dictionary is {} words long'.format(len(new_dict))
     return new_dict
 
 
-def wordchecker(new_dict, string):
-    for word in new_dict:
-        if string == word:
-            return True
+def wordchecker(new_dict, anagram):
+    if anagram in new_dict:
+        return True
     return False
 
 
-def word_list(new_dict, string):
-    word = string.word
+def word_list(new_dict, anagram):
+    word = anagram.word
     wordlist = list(word)
-    combos = itertools.permutations(wordlist)
+    combos = set([''.join(combo)
+                 for combo in set(itertools.permutations(wordlist))]
+                 )
+    tries = 0
+    match = 0
+
     for combo in combos:
-        new_word = ''.join(combo)
-        if wordchecker(new_dict, new_word):
-            print 'Match found: ' + new_word
-        else:
-            print 'No match found: ' + new_word
+        if wordchecker(new_dict, ''.join(combo)):
+            match += 1
+            print 'Match found: ' + ''.join(combo)
+        tries += 1
+    checks_per_second = (tries * len(new_dict)) / time.clock()
+    print '{} matches found out of {} combinations in {} seconds\n{} checks per second'.format(
+        match,
+        tries,
+        time.clock(),
+        checks_per_second,
+        )
 
 
 def main():
-    string = parser()
-    new_dict = stripper(string)
-    word_list(new_dict, string)
+    time.clock()
+    anagram = parser()
+    new_dict = stripper(anagram)
+    word_list(new_dict, anagram)
 
 
 if __name__ == "__main__":
