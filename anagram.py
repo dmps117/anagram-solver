@@ -22,7 +22,7 @@ def parser():
 def stripper(args):
     anagram = args.word
     print '{} letter anagram'.format(len(anagram))
-    filein = fileinput.input(['words'])
+    filein = fileinput.input(['a-z'])
     word_list = list(anagram)
     new_dict = []
 
@@ -40,7 +40,7 @@ def stripper(args):
     return new_dict
 
 
-def word_list(new_dict, anagram):
+def wordchecker(new_dict, anagram):
     word = anagram.word
     wordlist = list(word)
     combos = set([''.join(combo)
@@ -68,7 +68,7 @@ def main():
     time.clock()
     anagram = parser()
     new_dict = stripper(anagram)
-    word_list(new_dict, anagram)
+    wordchecker(new_dict, anagram)
 
 
 if __name__ == "__main__":
